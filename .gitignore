@@ -1,4 +1,32 @@
-.venv/
+# Environment
 .env
+
+# Virtual environments
+.venv/
+venv/
+.ven/
+
+# Python cache
 __pycache__/
 *.pyc
+
+# Database
+data/
+*.db
+*.sqlite
+
+# Reports / outputs
+*.pdf
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
+
+# Test files (we will NOT commit these)
+test_*.py
+debug_*.py

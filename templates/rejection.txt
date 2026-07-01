@@ -1,0 +1,10 @@
+Dear {name},
+
+Thank you for your application for the {job_title} position.
+
+After careful review, we regret to inform you that you have not been selected to proceed further.
+
+We appreciate your interest and wish you success in your job search.
+
+Kind regards,
+Recruitment Team

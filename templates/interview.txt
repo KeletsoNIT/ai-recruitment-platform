@@ -1,0 +1,12 @@
+Dear {name},
+
+Congratulations!
+
+You have been selected for an interview for the {job_title} position.
+
+We were impressed with your application and would like to proceed to the next stage.
+
+We will contact you soon with further details.
+
+Kind regards,
+Recruitment Team

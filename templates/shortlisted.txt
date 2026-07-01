@@ -1,0 +1,10 @@
+Dear {name},
+
+Good news!
+
+You have been shortlisted for the {job_title} position.
+
+Our team is currently reviewing final candidates and will be in touch soon.
+
+Kind regards,
+Recruitment Team
