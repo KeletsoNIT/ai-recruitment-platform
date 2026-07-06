@@ -92,7 +92,11 @@ def run_pipeline(cv_text, job_text):
         "placement": placement_result,
 
         "candidate_name": cv_data.get("name", "unknown"),
-
+"scores": {
+            "match_score": match_score,
+            "interview_score": interview_result.get("interview_score", 0),
+            "placement_score": placement_result.get("placement_score", 0)
+        },
         # FIX: consistent scoring
         "match_score": match_score,
 

@@ -13,17 +13,16 @@ def decide_email_type(score):
 
 def send_candidate_email(candidate, job_title):
 
-    # SAFE EXTRACTION (VERY IMPORTANT)
-    name = candidate.get("name")
+    print("DISPATCHER INPUT:", candidate)
+
+    name = candidate.get("name", "Candidate")
     email = candidate.get("email")
     score = candidate.get("score", 0)
-
-    print("DISPATCHER DEBUG:", candidate)
 
     if not email:
         return {
             "success": False,
-            "message": "Missing email address",
+            "message": "Missing email in dispatcher",
             "email_type": None
         }
 

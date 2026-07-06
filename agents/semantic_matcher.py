@@ -1,51 +1,21 @@
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from config import GOOGLE_API_KEY
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 
-def get_embeddings():
-    return GoogleGenerativeAIEmbeddings(
-        model="models/embedding-001",
-        google_api_key=GOOGLE_API_KEY
-    )
-
-# =========================
-# LAZY EMBEDDINGS
-# =========================
-
-_embeddings = None
-
-def get_embeddings():
-    global _embeddings
-
-    if _embeddings is None:
-        if not GOOGLE_API_KEY:
-            raise ValueError("Missing GOOGLE_API_KEY")
-
-        _embeddings = GoogleGenerativeAIEmbeddings(
-            model="models/embedding-001",
-            google_api_key=GOOGLE_API_KEY
-        )
-
-    return _embeddings
-
-
-# =========================
-# SEMANTIC MATCH FUNCTION
-# =========================
+_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 def semantic_match(cv_skills, jd_skills):
 
     if not cv_skills or not jd_skills:
         return 0
 
-    model = get_embeddings()
-
-    cv_vectors = model.embed_documents(cv_skills)
-    jd_vectors = model.embed_documents(jd_skills)
+    cv_vectors = _model.encode(cv_skills)
+    jd_vectors = _model.encode(jd_skills)
 
     similarities = []
 
-    for jd_vector in jd_vectors:
-        scores = cosine_similarity([jd_vector], cv_vectors)[0]
+    for jd_vec in jd_vectors:
+        scores = cosine_similarity([jd_vec], cv_vectors)[0]
         similarities.append(max(scores))
 
     return round(np.mean(similarities) * 100, 2)

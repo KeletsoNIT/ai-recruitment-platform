@@ -8,11 +8,12 @@ def get_embeddings():
 
     if _embeddings is None:
         if not GOOGLE_API_KEY:
-            raise ValueError("Missing GOOGLE_API_KEY in config")
+            raise ValueError("Missing GOOGLE_API_KEY")
 
         _embeddings = GoogleGenerativeAIEmbeddings(
-            model="text-embedding-004",
-            google_api_key=GOOGLE_API_KEY
+            model="models/embedding-001",  # fallback safe wrapper mode
+            google_api_key=GOOGLE_API_KEY,
+            task_type="retrieval_document"
         )
 
     return _embeddings
