@@ -11,46 +11,66 @@ from database.recruitment_repo import (
 
 def history_page():
 
-    st.title("📊 My Recruitment History")
+    st.title("📊 Recruitment History")
+    st.caption("View all previous recruitment sessions and candidate evaluations.")
 
     user_id = st.session_state.user_id
-
     sessions = get_user_sessions(user_id)
 
     if not sessions:
-        st.info("No recruitment history yet.")
+        st.info("No recruitment history available yet.")
         return
 
     for session in sessions:
 
-        with st.expander(f"🧾 {session['job_description'][:60]}..."):
+        with st.expander(f"🧾 {session['title']}"):
 
-            st.write("**Job Description:**")
-            st.write(session["job_description"])
+            # =========================
+            # Vacancy Information
+            # =========================
+            col1, col2 = st.columns(2)
 
-            st.write("**Date:**")
-            st.write(session["created_at"])
+            with col1:
+                st.metric("Job Title", session["title"])
+                st.metric("Department", session["department"])
 
+            with col2:
+                st.metric("Status", session["status"])
+                st.metric("Date", session["created_at"])
+
+            st.divider()
+
+            # =========================
+            # Candidate Results
+            # =========================
             candidates = get_session_candidates(session["id"])
 
-            if candidates:
+            if not candidates:
+                st.info("No candidates were evaluated for this recruitment session.")
+                continue
 
-                st.subheader("🏆 Candidates")
+            st.subheader("🏆 Candidate Rankings")
 
-                for c in candidates:
+            for index, candidate in enumerate(candidates, start=1):
 
-                    score = c["match_score"]
+                score = candidate["match_score"]
 
-                    if score >= 80:
-                        st.success(f"{c['candidate_name']} — {score}%")
-                    elif score >= 60:
-                        st.warning(f"{c['candidate_name']} — {score}%")
-                    else:
-                        st.error(f"{c['candidate_name']} — {score}%")
+                if score >= 80:
+                    badge = "🟢 Excellent Match"
+                    score_box = st.success
+                elif score >= 60:
+                    badge = "🟡 Good Match"
+                    score_box = st.warning
+                else:
+                    badge = "🔴 Low Match"
+                    score_box = st.error
 
-                    st.write(f"Recommendation: {c['recommendation']}")
+                st.markdown(f"### {index}. {candidate['candidate_name']}")
 
-                    st.progress(score / 100)
+                score_box(f"Match Score: **{score}%** • {badge}")
 
-            else:
-                st.info("No candidates found for this session.")
+                st.progress(score / 100)
+
+                st.write(f"**Recommendation:** {candidate['recommendation']}")
+
+                st.divider()

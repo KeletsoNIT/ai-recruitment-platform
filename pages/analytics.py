@@ -22,24 +22,21 @@ def analytics_page():
     # DATA COLLECTION
     # =========================
     all_scores = []
-    all_roles = []
+    all_recommendations = []
     tier_counter = Counter()
-    skill_counter = Counter()
 
-    for s in sessions:
-        candidates = get_session_candidates(s["id"])
+    for session in sessions:
+        candidates = get_session_candidates(session["id"])
 
-        for c in candidates:
+        for candidate in candidates:
 
-            score = c.get("match_score", 0)
+            score = candidate["match_score"]
+            recommendation = candidate["recommendation"]
+
             all_scores.append(score)
+            all_recommendations.append(recommendation)
 
-            role = c.get("recommendation", "Unknown")
-            all_roles.append(role)
-
-            # =========================
-            # TIER CLASSIFICATION
-            # =========================
+            # Candidate Tier
             if score >= 80:
                 tier = "Strong"
             elif score >= 60:
@@ -49,66 +46,61 @@ def analytics_page():
 
             tier_counter[tier] += 1
 
-            # =========================
-            # SKILL INSIGHTS (if stored)
-            # =========================
-            skills = c.get("matched_skills", [])
-            if isinstance(skills, list):
-                for s in skills:
-                    skill_counter[s] += 1
-
     # =========================
-    # 1. AVERAGE SCORE
+    # SUMMARY METRICS
     # =========================
     avg_score = sum(all_scores) / len(all_scores) if all_scores else 0
-    st.metric("📈 Average Match Score", f"{avg_score:.2f}%")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("Recruitment Sessions", len(sessions))
+
+    with col2:
+        st.metric("Candidates Reviewed", len(all_scores))
+
+    with col3:
+        st.metric("Average Match", f"{avg_score:.1f}%")
+
+    st.divider()
 
     # =========================
-    # 2. HIRING QUALITY DISTRIBUTION
+    # QUALITY DISTRIBUTION
     # =========================
     st.subheader("🎯 Candidate Quality Distribution")
-
     st.bar_chart(dict(tier_counter))
 
     # =========================
-    # 3. TOP ROLES
+    # RECOMMENDATIONS
     # =========================
-    st.subheader("🔥 Top Roles / Demand")
+    st.subheader("🤖 AI Recommendations")
 
-    role_counter = Counter(all_roles)
+    recommendation_counter = Counter(all_recommendations)
 
-    for role, count in role_counter.most_common(5):
-        st.write(f"**{role}** → {count} candidates")
-
-    # =========================
-    # 4. TOP SKILLS IN MARKET
-    # =========================
-    st.subheader("🧠 Most In-Demand Skills")
-
-    for skill, count in skill_counter.most_common(10):
-        st.write(f"**{skill}** → {count} mentions")
+    for recommendation, count in recommendation_counter.most_common():
+        st.write(f"**{recommendation}** — {count} candidates")
 
     # =========================
-    # 5. HIRING TRENDS
+    # HIRING TRENDS
     # =========================
-    st.subheader("📅 Hiring Trends")
+    st.subheader("📅 Recruitment Activity")
 
     trend = {}
 
-    for s in sessions:
-        date = str(s["created_at"])[:10]
+    for session in sessions:
+        date = str(session["created_at"])[:10]
         trend[date] = trend.get(date, 0) + 1
 
     st.line_chart(trend)
 
     # =========================
-    # 6. HIRING EFFICIENCY SCORE
+    # HIRING EFFICIENCY
     # =========================
     st.subheader("⚡ Hiring Efficiency")
 
-    strong = tier_counter.get("Strong", 0)
+    strong = tier_counter["Strong"]
     total = sum(tier_counter.values())
 
-    efficiency = (strong / total * 100) if total > 0 else 0
+    efficiency = (strong / total * 100) if total else 0
 
-    st.metric("Strong Hire Rate", f"{efficiency:.2f}%")
+    st.metric("Strong Candidate Rate", f"{efficiency:.1f}%")
